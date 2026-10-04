@@ -7,6 +7,8 @@ SELECT * FROM read_csv('data/raw/ativos.csv', delim = ';', header = true, all_va
 CREATE OR REPLACE VIEW raw_vulnerabilidades AS
 SELECT * FROM read_csv('data/raw/vulnerabilidades.csv', delim = ';', header = true, all_varchar = true, encoding = 'utf-8');
 
+-- Utilizando o TRIM para retirar possíveis espações em branco e padronizando colunas
+
 CREATE OR REPLACE TABLE ativos_tratados AS
 SELECT
     TRIM(ativo_id) AS ativo_id,
@@ -42,7 +44,7 @@ SELECT
     CASE WHEN lower(replace(replace(TRIM(origem), '-', ''), ' ', '')) = 'cloudsecurity'
          THEN 'Cloud Security' ELSE TRIM(origem) END AS origem,
     TRIM(status) AS status,
-    -- Datas em 3 formatos; datas impossíveis (31/02, mês 13) viram NULL via TRY_STRPTIME
+    -- Datas em 3 formatos
     CASE
         WHEN regexp_matches(TRIM(data_abertura), '^\d{2}/\d{2}/\d{4}$') THEN TRY_STRPTIME(TRIM(data_abertura), '%d/%m/%Y')
         WHEN regexp_matches(TRIM(data_abertura), '^\d{2}-\d{2}-\d{4}$') THEN TRY_STRPTIME(TRIM(data_abertura), '%m-%d-%Y')
