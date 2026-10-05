@@ -31,7 +31,7 @@ CREATE OR REPLACE TABLE vulnerabilidades_tratadas AS
 SELECT
     TRIM(vuln_id)  AS vuln_id,
     TRIM(ativo_id) AS ativo_id,
-    -- Regra de negócio: severidade pelo CVSS (a coluna manual diverge em ~74% dos casos)
+    -- Regra de negócio: severidade pelo CVSS
     CASE
         WHEN TRY_CAST(cvss_score AS DOUBLE) >= 0.0 AND TRY_CAST(cvss_score AS DOUBLE) <= 3.9  THEN 'Baixa'
         WHEN TRY_CAST(cvss_score AS DOUBLE) >= 4.0 AND TRY_CAST(cvss_score AS DOUBLE) <= 6.9  THEN 'Média'
@@ -40,7 +40,7 @@ SELECT
         ELSE 'Desconhecida'
     END AS severidade_corrigida,
     TRY_CAST(cvss_score AS DOUBLE) AS cvss_score,
-    -- Unifica 'CloudSecurity' / 'Cloud-Security'
+    -- Unifica 'CloudSecurity' e 'Cloud-Security'
     CASE WHEN lower(replace(replace(TRIM(origem), '-', ''), ' ', '')) = 'cloudsecurity'
          THEN 'Cloud Security' ELSE TRIM(origem) END AS origem,
     TRIM(status) AS status,
